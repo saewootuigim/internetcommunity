@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('accounts', '0005_topicvote'),
-        ('forum_conversation', '0014_alter_post_id_alter_topic_id'),
+        ('forum_conversation', '0013_auto_20201220_1745'),
     ]
 
     operations = [

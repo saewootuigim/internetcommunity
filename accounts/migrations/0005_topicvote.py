@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('accounts', '0004_profile_nickname_changed_at'),
-        ('forum_conversation', '0014_alter_post_id_alter_topic_id'),
+        ('forum_conversation', '0013_auto_20201220_1745'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
