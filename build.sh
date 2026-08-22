@@ -8,3 +8,4 @@ python manage.py collectstatic --no-input
 python manage.py compilemessages --locale=ko
 python manage.py migrate
 python manage.py ensure_superuser
+python manage.py ensure_forum
