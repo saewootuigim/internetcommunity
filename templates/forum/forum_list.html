@@ -1,0 +1,148 @@
+{% load i18n %}
+{% load mptt_tags %}
+{% load forum_tags %}
+{% load forum_conversation_tags %}
+{% load forum_member_tags %}
+{% load forum_tracking_tags %}
+{% load community_tags %}
+
+<div class="row">
+  <div class="col-12">
+    {% if forum_contents.nodes %}
+    {% recurseforumcontents forum_contents %}
+    {% if node.level == root_level %}
+    {% if node.obj.is_category %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><a href="{% url 'forum:forum' node.obj.slug node.obj.id %}" class="text-decoration-none text-dark">{{ node.obj.name }}</a></h5>
+      </div>
+      <div class="card-body p-0">
+        {{ children }}
+      </div>
+    </div>
+    {% else %}
+    {% with node.previous_sibling.obj as previous_sibling %}
+    {% if previous_sibling and previous_sibling.is_category or not previous_sibling in forum_contents.visible_forums or not previous_sibling %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0">{% trans "Forums" %}</h5>
+      </div>
+      <div class="card-body p-0">
+    {% endif %}
+    {% endwith %}
+    <div class="border-bottom">
+      <div class="px-3 py-2">
+        {% if not node.obj.is_link %}
+        <a href="{% url 'forum:forum' node.obj.slug node.obj.id %}" class="fw-semibold text-decoration-none">{{ node.obj.name }}</a>
+        <div><small>{{ children }}</small></div>
+        {% else %}
+        <a href="{% url 'forum:forum' node.obj.slug node.obj.id %}" class="fw-semibold text-decoration-none">{{ node.obj.name }}</a>
+        {% endif %}
+      </div>
+      {% if not node.obj.is_link and not node.obj.is_category %}
+      {% get_recent_topics node.obj 5 as recent_topics %}
+      {% if recent_topics %}
+      <div class="px-3 pb-3">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="text-center" style="width:50px">#</th>
+              <th>제목</th>
+              <th class="text-center" style="width:140px">작성일</th>
+              <th class="text-center" style="width:70px">조회</th>
+              <th class="text-center" style="width:70px">댓글</th>
+              <th class="text-center text-nowrap" style="width:140px">글쓴이</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for topic in recent_topics %}
+            <tr>
+              <td class="text-center text-muted">{{ topic.pk }}</td>
+              <td><a href="{% url 'forum_conversation:topic' topic.forum.slug topic.forum.pk topic.slug topic.pk %}" class="text-decoration-none">{{ topic.subject }}</a></td>
+              <td class="text-center text-muted"><small>{{ topic.created|date:"Y-m-d H:i" }}</small></td>
+              <td class="text-center text-muted">{{ topic.views_count }}</td>
+              <td class="text-center text-muted">{{ topic.posts_count|add:"-1" }}</td>
+              <td class="text-center text-nowrap">{% if topic.poster %}{% if request.user.is_authenticated %}<a href="{% url 'forum_member:profile' topic.poster_id %}" class="text-decoration-none">{{ topic.poster|forum_member_display_name }}</a>{% else %}{{ topic.poster|forum_member_display_name }}{% endif %}{% else %}-{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% with node.next_sibling.obj as next_sibling %}
+    {% if next_sibling and next_sibling.is_category or not next_sibling in forum_contents.visible_forums or not next_sibling %}
+      </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+    {% endif %}
+    {% elif node.level == root_level_middle %}
+    {% if node.parent.obj.is_category %}
+    <div class="border-bottom">
+      <div class="px-3 py-2">
+        {% if not node.obj.is_link %}
+        <a href="{% url 'forum:forum' node.obj.slug node.obj.id %}" class="fw-semibold text-decoration-none">{{ node.obj.name }}</a>
+        <div><small>{{ children }}</small></div>
+        {% else %}
+        <a href="{% url 'forum:forum' node.obj.slug node.obj.id %}" class="fw-semibold text-decoration-none">{{ node.obj.name }}</a>
+        {% endif %}
+      </div>
+      {% if not node.obj.is_link and not node.obj.is_category %}
+      {% get_recent_topics node.obj 5 as recent_topics %}
+      {% if recent_topics %}
+      <div class="px-3 pb-3">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="text-center" style="width:50px">#</th>
+              <th>제목</th>
+              <th class="text-center" style="width:140px">작성일</th>
+              <th class="text-center" style="width:70px">조회</th>
+              <th class="text-center" style="width:70px">댓글</th>
+              <th class="text-center text-nowrap" style="width:140px">글쓴이</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for topic in recent_topics %}
+            <tr>
+              <td class="text-center text-muted">{{ topic.pk }}</td>
+              <td><a href="{% url 'forum_conversation:topic' topic.forum.slug topic.forum.pk topic.slug topic.pk %}" class="text-decoration-none">{{ topic.subject }}</a></td>
+              <td class="text-center text-muted"><small>{{ topic.created|date:"Y-m-d H:i" }}</small></td>
+              <td class="text-center text-muted">{{ topic.views_count }}</td>
+              <td class="text-center text-muted">{{ topic.posts_count|add:"-1" }}</td>
+              <td class="text-center text-nowrap">{% if topic.poster %}{% if request.user.is_authenticated %}<a href="{% url 'forum_member:profile' topic.poster_id %}" class="text-decoration-none">{{ topic.poster|forum_member_display_name }}</a>{% else %}{{ topic.poster|forum_member_display_name }}{% endif %}{% else %}-{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+    {% else %}
+    {% if not node.previous_sibling %}
+    <b>{% trans "Subforums:" %}</b>&nbsp;
+    {% endif %}
+    <a href="{% url 'forum:forum' node.obj.slug node.obj.id %}" class="text-decoration-none">{{ node.obj.name }}</a>&nbsp;&nbsp;
+    {% endif %}
+    {% elif node.level == root_level_sub %}
+    {% if not node.previous_sibling %}
+    <b>{% trans "Subforums:" %}</b>&nbsp;
+    {% endif %}
+    <a href="{% url 'forum:forum' node.obj.slug node.obj.id %}" class="text-decoration-none">{{ node.obj.name }}</a>&nbsp;&nbsp;
+    {% endif %}
+    {% endrecurseforumcontents %}
+    {% else %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0">{% trans "Forums" %}</h5>
+      </div>
+      <div class="card-body">
+        <p class="text-muted mb-0">{% trans "No forums." %}</p>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>

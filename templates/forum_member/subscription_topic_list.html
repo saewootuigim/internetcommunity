@@ -1,0 +1,53 @@
+{% extends 'board_base.html' %}
+{% load i18n %}
+{% load forum_conversation_tags %}
+{% load forum_member_tags %}
+
+{% block sub_title %}스크랩 한 글{% endblock sub_title %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <h1>스크랩 한 글</h1>
+  </div>
+</div>
+{% if topics %}
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="text-center" style="width:50px">#</th>
+            <th>제목</th>
+            <th class="text-center" style="width:140px">작성일</th>
+            <th class="text-center" style="width:70px">조회</th>
+            <th class="text-center" style="width:70px">댓글</th>
+            <th class="text-center text-nowrap" style="width:140px">글쓴이</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for topic in topics %}
+          <tr>
+            <td class="text-center text-muted">{{ topic.pk }}</td>
+            <td><a href="{% url 'forum_conversation:topic' topic.forum.slug topic.forum.pk topic.slug topic.pk %}" class="text-decoration-none">{{ topic.subject }}</a></td>
+            <td class="text-center text-muted"><small>{{ topic.created|date:"Y-m-d H:i" }}</small></td>
+            <td class="text-center text-muted">{{ topic.views_count }}</td>
+            <td class="text-center text-muted">{{ topic.posts_count|add:"-1" }}</td>
+            <td class="text-center text-nowrap">{% if topic.poster %}<a href="{% url 'forum_member:profile' topic.poster_id %}" class="text-decoration-none">{{ topic.poster|forum_member_display_name }}</a>{% else %}-{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% else %}
+<p class="text-muted">스크랩 한 글이 없습니다.</p>
+{% endif %}
+<div class="mt-3">
+  {% with "pagination-sm justify-content-end" as pagination_size %}
+  {% include "partials/pagination.html" %}
+  {% endwith %}
+</div>
+{% endblock content %}

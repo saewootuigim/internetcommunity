@@ -1,0 +1,23 @@
+{% extends 'board_base.html' %}
+
+{% block title %}내 작성댓글{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <h1>내 작성댓글</h1>
+    {% if replies %}
+    <div class="post-list">
+        {% for post in replies %}
+        <div class="post-item">
+            <a href="{% url 'forum_conversation:topic' post.topic.forum.slug post.topic.forum.pk post.topic.slug post.topic.pk %}?post={{ post.pk }}#{{ post.pk }}">{{ post.topic.subject }}</a>
+            <span class="post-meta">{{ post.created|date:"Y-m-d H:i" }} | {{ post.topic.forum.name }}</span>
+            <p class="post-preview">{{ post.content|truncatewords:20 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-items">작성한 댓글이 없습니다.</p>
+    {% endif %}
+    <p class="back-link"><a href="{% url 'profile' %}">프로필로 돌아가기</a></p>
+</div>
+{% endblock %}

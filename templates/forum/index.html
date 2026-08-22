@@ -1,0 +1,10 @@
+{% extends 'board_base.html' %}
+{% load i18n %}
+{% load mptt_tags %}
+{% load forum_tags %}
+
+{% block sub_title %}{% trans "Index" %}{% endblock sub_title %}
+
+{% block content %}
+{% forum_list forums %}
+{% endblock content %}

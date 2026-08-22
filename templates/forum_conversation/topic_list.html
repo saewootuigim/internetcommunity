@@ -1,0 +1,61 @@
+{% load i18n %}
+{% load forum_conversation_tags %}
+{% load forum_member_tags %}
+{% load forum_tracking_tags %}
+
+{% if topics or not hide_if_empty %}
+<div class="mb-3">
+  <div class="card">
+    <div class="card-header">
+      <h5 class="mb-0">{% trans topic_list_title %}</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if not force_all_unread and unread_topics == None %}{% get_unread_topics topics request.user as unread_topics %}{% endif %}
+      {% if topics %}
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="text-center" style="width:50px">#</th>
+              <th>제목</th>
+              <th class="text-center" style="width:140px">작성일</th>
+              <th class="text-center" style="width:70px">조회</th>
+              <th class="text-center" style="width:70px">댓글</th>
+              <th class="text-center text-nowrap" style="width:140px">글쓴이</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for topic in topics %}
+            <tr>
+              <td class="text-center text-muted">{{ topic.pk }}</td>
+              <td>
+                <a href="{% url 'forum_conversation:topic' topic.forum.slug topic.forum.pk topic.slug topic.pk %}" class="text-decoration-none">{{ topic.subject }}</a>
+                {% if topic.is_locked %}<span class="badge bg-secondary ms-1">잠김</span>{% endif %}
+                {% if topic.is_sticky %}<span class="badge bg-info ms-1">고정</span>{% endif %}
+              </td>
+              <td class="text-center text-muted"><small>{{ topic.created|date:"Y-m-d H:i" }}</small></td>
+              <td class="text-center text-muted">{{ topic.views_count }}</td>
+              <td class="text-center text-muted">{{ topic.posts_count|add:"-1" }}</td>
+              <td class="text-center text-nowrap">
+                {% if topic.poster %}
+                {% if request.user.is_authenticated %}<a href="{% url 'forum_member:profile' topic.poster_id %}" class="text-decoration-none">{{ topic.poster|forum_member_display_name }}</a>{% else %}{{ topic.poster|forum_member_display_name }}{% endif %}
+                {% else %}
+                {{ topic.first_post.username }}
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="p-3">
+        <p class="text-muted mb-0">
+          {% if empty_message %}{{ empty_message }}{% else %}{% trans "There are no topics in this forum." %}{% endif %}
+        </p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}

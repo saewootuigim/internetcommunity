@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}커뮤니티 - 홈{% endblock %}
+
+{% block content %}
+<div class="landing">
+    <h1>게시판 목록</h1>
+    <p class="subtitle">게시판을 선택하여 글을 읽거나 토론에 참여하세요</p>
+
+    <div class="bulletin-grid">
+        {% for bulletin in bulletins %}
+        <a href="#" class="bulletin-card">
+            <h2>{{ bulletin.name }}</h2>
+            <p>{{ bulletin.description }}</p>
+        </a>
+        {% empty %}
+        <p class="no-bulletins">아직 게시판이 없습니다. 곧 추가될 예정입니다!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load forum_permission_tags %}
+
+{% get_permission 'can_subscribe_to_topic' topic request.user as user_can_subscribe_to_topic %}
+{% get_permission 'can_unsubscribe_from_topic' topic request.user as user_can_unsubscribe_from_topic %}
+
+{% if user_can_subscribe_to_topic %}
+<a href="{% url 'forum_member:topic_subscribe' topic.pk %}" class="btn btn-outline-secondary btn-sm">{% trans "Subscribe" %}</a>
+{% elif user_can_unsubscribe_from_topic %}
+<a href="{% url 'forum_member:topic_unsubscribe' topic.pk %}" class="btn btn-secondary btn-sm">{% trans "Unsubscribe" %}</a>
+{% endif %}

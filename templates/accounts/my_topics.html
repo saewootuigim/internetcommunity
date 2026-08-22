@@ -1,0 +1,22 @@
+{% extends 'board_base.html' %}
+
+{% block title %}내 작성글{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <h1>내 작성글</h1>
+    {% if topics %}
+    <div class="post-list">
+        {% for topic in topics %}
+        <div class="post-item">
+            <a href="{% url 'forum_conversation:topic' topic.forum.slug topic.forum.pk topic.slug topic.pk %}">{{ topic.subject }}</a>
+            <span class="post-meta">{{ topic.created|date:"Y-m-d H:i" }} | {{ topic.forum.name }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-items">작성한 글이 없습니다.</p>
+    {% endif %}
+    <p class="back-link"><a href="{% url 'profile' %}">프로필로 돌아가기</a></p>
+</div>
+{% endblock %}

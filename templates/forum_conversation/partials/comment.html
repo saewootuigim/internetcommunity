@@ -1,0 +1,62 @@
+{% load i18n %}
+{% load forum_conversation_tags %}
+{% load forum_member_tags %}
+{% load forum_permission_tags %}
+{# Expects: post, forum, topic, user_can_add_post, depth, parent, is_op #}
+<div class="d-flex comment-row">
+  {# ---- Author column ---- #}
+  <div class="comment-author flex-shrink-0">
+    <div class="fw-bold">
+      {% if depth %}<span class="text-secondary">&#8618;</span>&nbsp;{% endif %}
+      {% if post.poster %}
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'forum_member:profile' post.poster_id %}" class="text-decoration-none text-dark">{{ post.poster|forum_member_display_name }}</a>
+        {% else %}
+        {{ post.poster|forum_member_display_name }}
+        {% endif %}
+      {% else %}{{ post.username }}{% endif %}
+    </div>
+    {% if is_op %}<div class="text-danger small">본문 글쓴이</div>{% endif %}
+    <div class="text-muted small">{{ post.created|date:"H:i:s" }}</div>
+  </div>
+
+  {# ---- Body column ---- #}
+  <div class="comment-body flex-grow-1">
+    {% if deleted %}
+    <div class="post-content text-muted fst-italic">
+      삭제된 댓글입니다. {% if deleted.deleted_by %}{{ deleted.deleted_by.get_display_name }}가 {% endif %}{{ deleted.deleted_at|date:"Y-m-d H:i" }}에 삭제함.
+    </div>
+    {% else %}
+    {% if parent %}
+    <div class="text-muted small mb-1">[ {% if parent.poster %}{{ parent.poster|forum_member_display_name }}{% else %}{{ parent.username }}{% endif %} ]</div>
+    {% endif %}
+    <div class="post-content">
+      {{ post.content.rendered }}
+    </div>
+    {% if post.updates_count %}
+    <div class="mt-2">
+      <small class="text-muted">
+        최종 수정: {% if post.updated_by %}{{ post.updated_by|forum_member_display_name }}가&nbsp;{% endif %}{{ post.updated|date:"Y-m-d H:i" }} 에 수정함.
+      </small>
+    </div>
+    {% endif %}
+
+    {% get_permission 'can_edit_post' post request.user as user_can_edit_post %}
+    {% get_permission 'can_delete_post' post request.user as user_can_delete_post %}
+    <div class="mt-2 d-flex gap-2 justify-content-end align-items-center">
+      {% if user_can_edit_post %}
+      <a href="{% url 'forum_conversation:post_update' forum.slug forum.pk topic.slug topic.pk post.pk %}" class="btn btn-sm btn-outline-secondary">수정</a>
+      {% endif %}
+      {% if user_can_delete_post %}
+      <form method="post" action="{% url 'delete_comment' post.pk %}" onsubmit="return confirm('이 댓글을 삭제하시겠습니까?');" class="m-0">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-outline-secondary">삭제</button>
+      </form>
+      {% endif %}
+      {% if user_can_add_post %}
+      <button type="button" class="btn btn-sm btn-outline-secondary reply-toggle" data-target="{{ post.pk }}">대댓글 달기</button>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>

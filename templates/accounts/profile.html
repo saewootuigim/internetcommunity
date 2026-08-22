@@ -1,0 +1,133 @@
+{% extends 'board_base.html' %}
+
+{% block title %}내 프로필{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <h1>내 프로필</h1>
+
+    <div class="profile-section">
+        <h2>기본 정보</h2>
+        <table class="profile-table">
+            <tr>
+                <th>아이디</th>
+                <td>{{ user.username }}</td>
+            </tr>
+            <tr>
+                <th>닉네임</th>
+                <td>
+                    <form method="post" action="{% url 'change_nickname' %}" class="nickname-inline-form" id="nickname-form">
+                        {% csrf_token %}
+                        <span id="nickname-display">{{ profile.nickname }}</span>
+                        <input type="text" id="nickname-input" name="nickname" value="{{ profile.nickname }}" maxlength="30" class="nickname-input hidden" required>
+                        <button type="button" id="nickname-cancel-btn" class="btn btn-small hidden" onclick="cancelNicknameEdit()">취소</button>
+                        <button type="button" id="nickname-btn" class="btn btn-small" onclick="toggleNicknameEdit()">변경</button>
+                        {% if profile.nickname_changed_at %}
+                        <span class="nickname-changed-info">마지막 변경: {{ profile.nickname_changed_at|date:"Y-m-d H:i" }}</span>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <th>가입일</th>
+                <td>{{ user.date_joined|date:"Y년 n월 j일" }}</td>
+            </tr>
+            <tr>
+                <th>마지막 로그인 일시</th>
+                <td>{% if profile.previous_login %}{{ profile.previous_login|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <th>지금 로그인 일시</th>
+                <td>{% if profile.current_login %}{{ profile.current_login|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td>
+            </tr>
+            <tr>
+                <th>로그인 횟수</th>
+                <td>{{ profile.login_count }}회</td>
+            </tr>
+            <tr>
+                <th>작성한 글</th>
+                <td>{{ topic_count }}개 <a href="{% url 'my_topics' %}" class="btn btn-small">작성글 보기</a></td>
+            </tr>
+            <tr>
+                <th>작성한 댓글</th>
+                <td>{{ post_count }}개 <a href="{% url 'my_replies' %}" class="btn btn-small">작성댓글 보기</a></td>
+            </tr>
+            <tr>
+                <th>스크랩 한 글</th>
+                <td>{{ scrap_count }}개 <a href="{% url 'forum_member:user_subscriptions' %}" class="btn btn-small">스크랩 보기</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="profile-section">
+        <h2>비밀번호 변경</h2>
+        <form method="post" action="{% url 'change_password' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="old_password">현재 비밀번호</label>
+                <input type="password" id="old_password" name="old_password" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password1">새 비밀번호</label>
+                <input type="password" id="new_password1" name="new_password1" required>
+            </div>
+            <div class="form-group">
+                <label for="new_password2">새 비밀번호 확인</label>
+                <input type="password" id="new_password2" name="new_password2" required>
+            </div>
+            <button type="submit" class="btn btn-login">변경</button>
+        </form>
+    </div>
+
+    <div class="profile-section">
+        <a href="{% url 'logout' %}" class="btn btn-logout">로그아웃</a>
+    </div>
+
+    <div class="profile-section profile-danger">
+        <h2>계정 삭제</h2>
+        <p>탈퇴하면 모든 데이터가 삭제되며 복구할 수 없습니다.</p>
+        <form method="post" action="{% url 'delete_account' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" onclick="return confirm('정말 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')">탈퇴</button>
+        </form>
+    </div>
+</div>
+
+<script>
+var editing = false;
+function toggleNicknameEdit() {
+    var display = document.getElementById('nickname-display');
+    var input = document.getElementById('nickname-input');
+    var cancelBtn = document.getElementById('nickname-cancel-btn');
+    var form = document.getElementById('nickname-form');
+    if (!editing) {
+        display.classList.add('hidden');
+        input.classList.remove('hidden');
+        cancelBtn.classList.remove('hidden');
+        input.focus();
+        editing = true;
+    } else {
+        form.submit();
+    }
+}
+function cancelNicknameEdit() {
+    var display = document.getElementById('nickname-display');
+    var input = document.getElementById('nickname-input');
+    var cancelBtn = document.getElementById('nickname-cancel-btn');
+    display.classList.remove('hidden');
+    input.classList.add('hidden');
+    cancelBtn.classList.add('hidden');
+    input.value = display.textContent;
+    editing = false;
+}
+document.getElementById('nickname-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('nickname-form').submit();
+    }
+    if (e.key === 'Escape') {
+        cancelNicknameEdit();
+    }
+});
+</script>
+{% endblock %}
